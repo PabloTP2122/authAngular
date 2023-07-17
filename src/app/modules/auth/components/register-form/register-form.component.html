@@ -1,5 +1,54 @@
-<h1 class="text-center font-bold py-2 text-gray-700">Enter your data</h1>
-<form [formGroup]="form" novalidate class="space-y-4" (ngSubmit)="register()">
+<form
+  *ngIf="!availabelEmail"
+  [formGroup]="formUser"
+  novalidate
+  class="space-y-4"
+  (ngSubmit)="validateUser()"
+>
+  <h1 class="text-center font-bold py-2 text-gray-700">Enter your data</h1>
+  <div>
+    <div class="relative">
+      <input
+        #nameInput
+        formControlName="email"
+        placeholder="Enter email"
+        type="email"
+        name="email"
+        class="w-full rounded bg-gray-100 border-gray-300 border-2"
+      />
+    </div>
+    <div
+      *ngIf="formUser.controls.email.touched && formUser.controls.email.invalid"
+    >
+      <p
+        *ngIf="formUser.controls.email.hasError('required')"
+        class="font-medium text-red-500 text-xs mt-1 ml-1"
+      >
+        This field is mandatory
+      </p>
+      <p
+        *ngIf="formUser.controls.email.hasError('email')"
+        class="font-medium text-red-500 text-xs mt-1 ml-1"
+      >
+        This field should be a email
+      </p>
+    </div>
+  </div>
+  <div>
+    <app-btn typeBtn="submit" color="success" [loading]="status === 'loading'"
+      >Continue</app-btn
+    >
+  </div>
+</form>
+
+<form
+  *ngIf="availabelEmail"
+  [formGroup]="form"
+  novalidate
+  class="space-y-4"
+  (ngSubmit)="register()"
+>
+  <h1 class="text-center font-bold py-2 text-gray-700">Enter your data</h1>
   <div>
     <div class="relative">
       <input
@@ -74,7 +123,7 @@
         *ngIf="form.controls.password.hasError('minlength')"
         class="font-medium text-red-500 text-xs mt-1 ml-1"
       >
-        This field should be greater than 6 characters
+        This field should be greater than 8 characters
       </p>
     </div>
   </div>
@@ -83,9 +132,16 @@
       <input
         formControlName="confirmPassword"
         placeholder="Confirm password"
-        type="password"
+        [type]="showPasswordConfirm ? 'text': 'password'"
         class="w-full rounded bg-gray-100 border-gray-300 border-2"
       />
+      <button
+        type="button"
+        class="p-2 absolute right-2"
+        (click)="showPasswordConfirm = !showPasswordConfirm"
+      >
+        <fa-icon [icon]="showPassword ? faEye : faEyeSlash"></fa-icon>
+      </button>
     </div>
     <div
       *ngIf="
@@ -103,7 +159,7 @@
         *ngIf="form.controls.confirmPassword.hasError('minlength')"
         class="font-medium text-red-500 text-xs mt-1 ml-1"
       >
-        This field should be greater than 6 characters
+        This field should be greater than 8 characters.
       </p>
     </div>
   </div>
@@ -112,7 +168,12 @@
       *ngIf="form.hasError('mismatch')"
       class="font-medium text-red-500 text-xs mt-1 ml-1"
     >
-      The password are not the same
+      The password are not the same.
+    </p>
+  </div>
+  <div *ngIf="errorApi === 'SqliteError: UNIQUE constraint failed: user.email'">
+    <p class="font-medium text-red-500 text-xs mt-1 ml-1">
+      The user is already registered.
     </p>
   </div>
   <div>
